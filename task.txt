@@ -1,0 +1,7 @@
+Sim: Just keep 3 values (Single, Dual and No), 
+
+Display Resolution:  Split into 2 columns (Screen Size & Screen to body Ratio) Just keep the float values nothing else), 
+
+OS Just keep the name of OS and Version (remove everything else like Android 4.2.2/), 
+
+CPU, chipset, GPU no need to do anything
