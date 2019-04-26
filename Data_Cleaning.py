@@ -219,13 +219,88 @@ def clean_data(Phones1):
 
 #----------------------- CHENGZHI ---------------------------
     
+def clean_SIM(SIM):
+    sim_column_list = SIM
+    # Micro, Mini, Nano, Electronic all belongs to the Single.
+    for i in range(len(sim_column_list)):
+        cell = str(sim_column_list[i])
+        if 'Dual' in cell:
+            sim_column_list[i] = 'Dual'
+        elif 'Triple' in cell:
+            sim_column_list[i] = 'Triple'
+        elif 'Yes' in cell:
+            sim_column_list[i] = 'Yes'
+        elif 'No' in cell:
+            sim_column_list[i] = 'No'
+        elif 'Single' in cell or 'Mini' in cell or \
+            'Micro' in cell or 'Nano' in cell or 'Electronic' in cell:
+            sim_column_list[i] = 'Single'
+        else:
+            sim_column_list[i] =  'other'
+    return sim_column_list
 
+def clean_display_resolution(display_resolution):
+    display_size = []
+    screen_to_body_ratio = []
+    display_column_list = display_resolution
+    for i in range(len(display_column_list)):
+        cell = str(display_column_list[i])
 
-    
+        l = re.findall('.*inches', cell)
+        if len(l) == 0:
+            inch = ''
+        else:
+            inch = str(l[0])
+        inch = inch.replace(' inches', '')
+        display_size.append(inch)
+
+        l = re.findall('~.*\%', cell)
+        if len(l) == 0:
+            ratio = ''
+        else:
+            ratio = str(l[0])
+        # ratio = str(re.findall('~.*\%', cell))
+        ratio = ratio.replace('~', '')
+        ratio = ratio.replace('%', '')
+        screen_to_body_ratio.append(ratio)
+
+    return [pd.Series(display_size), pd.Series(screen_to_body_ratio)]
+
+def clean_OS(os_column_list):
+    os_list = []
+    for i in range(len(os_column_list)):
+        cell = str(os_column_list[i])
+        if 'Android' in cell:
+            l = re.match(r'^Android ((\d\.\d\.\d)|(\d\.\d))', cell)
+            g = None
+            if l:
+                g = l.group()
+            if g is None or len(g) == 0:
+                android_version = 'Android'
+            else:
+                android_version = str(g)
+            os_list.append(android_version)
+        elif 'Windows' in cell or 'Microsoft' in cell:
+            os_list.append('Windows')
+        elif 'Bada' in cell:
+            os_list.append('Bada')
+        elif 'Tizen' in cell:
+            os_list.append('Tizen')
+        elif 'BlackBerry' in cell:
+            os_list.append('BlackBerry')
+        elif 'Symbian' in cell:
+            os_list.append('Symbian')
+        elif 'iOS' in cell:
+            os_list.append('iOS')
+        elif 'nan' == cell:
+            os_list.append('')
+        else:
+            os_list.append('Other')
+    return pd.Series(os_list)
+
 ## ------------------------------- MAIN METHOD -------------------------------
 if __name__ == "__main__":  
     
-  
     data = pd.read_csv(FILE_PATH)
 
     print('Cleaning Data...')
@@ -243,7 +318,7 @@ if __name__ == "__main__":
     secondary_camera=clean_secondary_camera_data(data["secondary_camera"])
     loud_speaker=clean_loud_speaker_data(data["loud_speaker"])
     approx_price_DOLLAR=clean_approx_price_EUR_data(data["approx_price_EUR"])
-  
+
     #DATA --DARP
     #brand=clean_brand_data(data["brand"])
     #clean_data=clean_data(data)
@@ -251,8 +326,10 @@ if __name__ == "__main__":
     #network_technology=clean_network_technology_data(data["network_technology"])
     
     #DATA --CHENGZHI
-    
-    
+    SIM=clean_SIM(data["SIM"])
+    display_size, screen_to_body_ratio = clean_display_resolution(data["display_resolution"])
+    OS=clean_OS(data["OS"])
+
     print('Data Cleaning is done.')
-    pd.concat({"RAM":RAM,"primary_camera":primary_camera,"secondary_camera":secondary_camera,"loud_speaker":loud_speaker,"audio_jack": audio_jack, "GPS": GPS, "NFC":  NFC, "radio": radio, "battery": battery,"approx_price_DOLLAR":approx_price_DOLLAR}, axis = 1).to_csv("DATASET/Refined_Phone_Dataset.csv")
+    pd.concat({"SIM": SIM, "display_size":display_size, "screen_to_body_ratio":screen_to_body_ratio,"OS":OS,"RAM":RAM,"primary_camera":primary_camera,"secondary_camera":secondary_camera,"loud_speaker":loud_speaker,"audio_jack": audio_jack, "GPS": GPS, "NFC":  NFC, "radio": radio, "battery": battery,"approx_price_DOLLAR":approx_price_DOLLAR}, axis = 1).to_csv("DATASET/Refined_Phone_Dataset.csv")
     #pd.concat(clean_data_darp, axis = 1).to_csv("DATASET/alisha_refined_phonedata.csv")
