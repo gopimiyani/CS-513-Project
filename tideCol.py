@@ -61,11 +61,20 @@ display_column_list = list(df['display_resolution'])
 for i in range(len(display_column_list)):
     cell = str(display_column_list[i])
 
-    inch = str(re.findall('.*inches', cell))
+    l = re.findall('.*inches', cell)
+    if len(l) == 0:
+        inch = ''
+    else:
+        inch = str(l[0])
     inch = inch.replace(' inches', '')
     display_size.append(inch)
 
-    ratio = str(re.findall('~.*\%', cell))
+    l = re.findall('~.*\%', cell)
+    if len(l) == 0:
+        ratio = ''
+    else:
+        ratio = str(l[0])
+    # ratio = str(re.findall('~.*\%', cell))
     ratio = ratio.replace('~', '')
     ratio = ratio.replace('%', '')
     screen_to_body_ratio.append(ratio)
@@ -92,7 +101,17 @@ os_list = []
 for i in range(len(os_column_list)):
     cell = str(os_column_list[i])
     if 'Android' in cell:
-        os_list.append('Android')
+        l = re.match(r'^Android ((\d\.\d\.\d)|(\d\.\d))', cell)
+        g = None
+        if l:
+            g = l.group()
+        if g is None or len(g) == 0:
+            android_version = 'Android'
+        else:
+            android_version = str(g)
+        os_list.append(android_version)
+
+        # os_list.append(cell)
         android_count += 1
     elif 'Windows' in cell or 'Microsoft' in cell:
         os_list.append('Windows')
