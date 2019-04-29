@@ -179,8 +179,27 @@ def clean_loud_speaker_data(loud_speaker):
     return loud_speaker
 
 #INTERNAL MEMORY
+def get_GB(data_col):
+    val = data_col.str.extract(r"(\b\d+)")
+#     print(val)
+    #return val
+    return val.astype(float)
+
+def convert_MB_to_GB(data_col):
+    MB_val = get_GB(data_col)
+    return MB_val/1024
+
+
     
-#def clean_internal_memory_data(internal_memory):
+def clean_internal_memory_data(internal_memory):
+    internal_memory=pd.Series(np.where(internal_memory.str.contains("/"),internal_memory.str.rsplit('/',expand=True,n=1).get(1),internal_memory.str.rsplit('/',expand=True,n=1).get(0)))
+    #print(internal_memory)
+    internal_memory=internal_memory.fillna(0)
+
+    #internal_memory=internal_memory.str.extract(r"(\b\d+ MB| \b\d+ GB)")
+    #internal_memory = pd.Series(np.where(internal_memory.str.contains("GB"), get_GB(internal_memory), convert_MB_to_GB(internal_memory)))
+    print(internal_memory)
+    return internal_memory
     
 #----------------------- DARP ---------------------------
 #
@@ -228,15 +247,14 @@ def clean_SIM(SIM):
             sim_column_list[i] = 'Dual'
         elif 'Triple' in cell:
             sim_column_list[i] = 'Triple'
-        elif 'Yes' in cell:
-            sim_column_list[i] = 'Yes'
         elif 'No' in cell:
             sim_column_list[i] = 'No'
-        elif 'Single' in cell or 'Mini' in cell or \
+        elif 'Yes' in cell or 'Single' in cell or 'Mini' in cell or \
             'Micro' in cell or 'Nano' in cell or 'Electronic' in cell:
             sim_column_list[i] = 'Single'
         else:
-            sim_column_list[i] =  'other'
+            sim_column_list[i] = np.nan
+    #print(sim_column_list)
     return sim_column_list
 
 def clean_display_resolution(display_resolution):
@@ -292,10 +310,8 @@ def clean_OS(os_column_list):
             os_list.append('Symbian')
         elif 'iOS' in cell:
             os_list.append('iOS')
-        elif 'nan' == cell:
-            os_list.append('')
         else:
-            os_list.append('Other')
+            os_list.append(np.nan)
     return pd.Series(os_list)
 
 ## ------------------------------- MAIN METHOD -------------------------------
@@ -318,7 +334,7 @@ if __name__ == "__main__":
     secondary_camera=clean_secondary_camera_data(data["secondary_camera"])
     loud_speaker=clean_loud_speaker_data(data["loud_speaker"])
     approx_price_DOLLAR=clean_approx_price_EUR_data(data["approx_price_EUR"])
-
+    internal_memory=clean_internal_memory_data(data["internal_memory"])
     #DATA --DARP
     #brand=clean_brand_data(data["brand"])
     #clean_data=clean_data(data)
@@ -331,5 +347,9 @@ if __name__ == "__main__":
     OS=clean_OS(data["OS"])
 
     print('Data Cleaning is done.')
-    pd.concat({"SIM": SIM, "display_size":display_size, "screen_to_body_ratio":screen_to_body_ratio,"OS":OS,"RAM":RAM,"primary_camera":primary_camera,"secondary_camera":secondary_camera,"loud_speaker":loud_speaker,"audio_jack": audio_jack, "GPS": GPS, "NFC":  NFC, "radio": radio, "battery": battery,"approx_price_DOLLAR":approx_price_DOLLAR}, axis = 1).to_csv("DATASET/Refined_Phone_Dataset.csv")
+    pd.concat({"SIM": SIM, "display_size":display_size, "screen_to_body_ratio":screen_to_body_ratio,"OS":OS,
+               "internal_memory":internal_memory,"RAM":RAM,"primary_camera":primary_camera,"secondary_camera":secondary_camera,
+               "loud_speaker":loud_speaker,
+               "audio_jack": audio_jack, "GPS": GPS, "NFC":  NFC, "radio": radio, "battery": battery,
+               "approx_price_DOLLAR":approx_price_DOLLAR}, axis = 1).to_csv("DATASET/Refined_Phone_Dataset.csv")
     #pd.concat(clean_data_darp, axis = 1).to_csv("DATASET/alisha_refined_phonedata.csv")
