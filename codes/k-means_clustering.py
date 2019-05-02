@@ -14,37 +14,41 @@ df = pd.read_csv('./Final_Refined_Encoded_Normalysed.csv')
 
 train, test = train_test_split(df, test_size = 0.3, random_state = 10)
 
-print("***** Train_Set *****")
-print(train.head())
-print("\n")
-print("***** Test_Set *****")
-print(test.head())
+# print("***** Train_Set *****")
+# print(train.head())
+# print("\n")
+# print("***** Test_Set *****")
+# print(test.head())
 
-print("***** Train_Set *****")
-print(train.describe())
-print("\n")
-print("***** Test_Set *****")
-print(test.describe())
+# print("***** Train_Set *****")
+# print(train.describe())
+# print("\n")
+# print("***** Test_Set *****")
+# print(test.describe())
 
-print(train.columns.values)
+# print(train.columns.values)
 
-print(train.isna().head())
-print(test.isna().head())
+# print(train.isna().head())
+# print(test.isna().head())
 
-print("*****In the train set*****")
-print(train.isna().sum())
-print("\n")
-print("*****In the test set*****")
-print(test.isna().sum())
+# print("*****In the train set*****")
+# print(train.isna().sum())
+# print("\n")
+# print("*****In the test set*****")
+# print(test.isna().sum())
 
-print(train[['GPU', 'Price']].groupby(['GPU'], as_index=False).mean().sort_values(by='Price', ascending=False))
-g = sns.FacetGrid(train, col='Price')
-g.map(plt.hist, 'GPU', bins=20)
+# print(train[['GPU', 'Price']].groupby(['GPU'], as_index=False).mean().sort_values(by='Price', ascending=False))
+# g = sns.FacetGrid(train, col='Price')
+# g.map(plt.hist, 'GPU', bins=20)
 
-train.info()
-test.info()
+# train.info()
+# test.info()
 
-X = np.array(train.drop(['Price'], 1).astype(float))
+# X = np.array(train.drop(['Price'], 1).astype(float))
+X = np.array(train[['SIM', 'CPU', 'GPU', 'memory_card', 'weight_g', 'screen_to_body_ratio', \
+    'primary_camera', 'internal_memory', 'Thickness',\
+    'display_size', 'OS', 'radio', 'RAM', 'EDGE'\
+    ]])
 y = np.array(train['Price'])
 train.info()
 
@@ -53,7 +57,7 @@ train.info()
 # kmeans = KMeans(n_clusters=3, max_iter=600, algorithm = 'auto')
 
 kmeans = KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=600,
-    n_clusters=5, n_init=10, n_jobs=1, precompute_distances='auto',
+    n_clusters=6, n_init=10, n_jobs=1, precompute_distances='auto',
     random_state=None, tol=0.0001, verbose=0)
 
 scaler = MinMaxScaler()
