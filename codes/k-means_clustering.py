@@ -1,4 +1,4 @@
-# https://www.datacamp.com/community/tutorials/k-means-clustering-python
+# Reference: https://www.datacamp.com/community/tutorials/k-means-clustering-python
 
 import pandas as pd
 import numpy as np
@@ -8,7 +8,6 @@ from sklearn.preprocessing import MinMaxScaler
 import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-
 
 df = pd.read_csv('./Final_Refined_Encoded_Normalysed.csv')
 
@@ -50,11 +49,11 @@ X = np.array(train[['SIM', 'CPU', 'GPU', 'memory_card', 'weight_g', 'screen_to_b
     'display_size', 'OS', 'radio', 'RAM', 'EDGE'\
     ]])
 y = np.array(train['Price'])
-train.info()
+# train.info()
 
-# kmeans = KMeans(n_clusters
-# =2) # You want cluster the passenger records into 2: Survived or Not survived
-# kmeans = KMeans(n_clusters=3, max_iter=600, algorithm = 'auto')
+# kmeans = KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=600,
+#     n_clusters=6, n_init=10, n_jobs=1, precompute_distances='auto',
+#     random_state=None, tol=0.0001, verbose=0)
 
 kmeans = KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=600,
     n_clusters=6, n_init=10, n_jobs=1, precompute_distances='auto',
@@ -62,15 +61,7 @@ kmeans = KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=600,
 
 scaler = MinMaxScaler()
 X_scaled = scaler.fit_transform(X)
-kmeans.fit(X)
-
-# KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=300,
-#     n_clusters=2, n_init=10, n_jobs=1, precompute_distances='auto',
-#     random_state=None, tol=0.0001, verbose=0)
-
-# kmeans = KMeans(algorithm='auto', copy_x=True, init='k-means++', max_iter=600,
-#     n_clusters=5, n_init=10, n_jobs=1, precompute_distances='auto',
-#     random_state=None, tol=0.0001, verbose=0)
+kmeans.fit(X_scaled)
 
 correct = 0
 for i in range(len(X)):
@@ -80,6 +71,4 @@ for i in range(len(X)):
     if prediction[0] == y[i]:
         correct += 1
 
-print(correct/len(X))
-
-# plt.show()
+print("Accuracy Rate:", correct/len(X))
